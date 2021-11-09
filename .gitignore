@@ -1,2 +1,5 @@
 # We omit node modules
 node_modules
+
+# Omit Visual Studio REST client
+requests
