@@ -2,10 +2,30 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 
-app.use(morgan("tiny"));
 app.use(express.json());
 
-const PORT = 3001;
+morgan.token("body", function getRequestBody(req, res) {
+    return JSON.stringify(req.body);
+});
+
+const requestLogger = (tokens, req, res) => {
+    const method = tokens.method(req, res);
+    let log = [
+        method,
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, "content-length"),
+        "-",
+        tokens["response-time"](req, res),
+        "ms",
+    ];
+
+    return method === "POST"
+        ? [...log, tokens.body(req, res)].join(" ")
+        : log.join(" ");
+};
+
+app.use(morgan(requestLogger));
 
 let persons = [
     {
@@ -96,6 +116,7 @@ app.post("/api/persons", (request, response) => {
     response.json(person);
 });
 
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server listen on port ${PORT}`);
 });
