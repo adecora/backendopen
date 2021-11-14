@@ -17,11 +17,20 @@ mongoose
 const personSchema = new mongoose.Schema({
     name: {
         type: String,
+        minLength: 3,
         required: true,
         unique: true,
     },
     number: {
         type: String,
+        validate: {
+            validator: (value) =>
+                value
+                    .split("")
+                    .reduce((acc, act) => (acc += /\d/.test(act)), 0) >= 8,
+            message: (props) =>
+                `Phone number: ${props.value}, must have at least 8 digits.`,
+        },
         required: true,
     },
 });
