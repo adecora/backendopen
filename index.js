@@ -66,36 +66,20 @@ app.delete("/api/persons/:id", (request, response, next) => {
         .catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
     const { name, number } = request.body;
 
-    if (!name || !number) {
-        response.status(400);
-        const missing =
-            !name && !number ? "name and number" : !name ? "name" : "number";
-        return response.json({
-            error: `${missing} missing`,
-        });
-    }
-
-    Person.find({}).then((persons) => {
-        const names = persons.map((p) => p.name.toLowerCase());
-
-        if (names.includes(name.toLowerCase())) {
-            return response.status(400).json({
-                error: "name must be unique",
-            });
-        }
-
-        const person = new Person({
-            name: name,
-            number: number,
-        });
-
-        person.save().then((savedPerson) => {
-            response.json(savedPerson);
-        });
+    const person = new Person({
+        name: name,
+        number: number,
     });
+
+    person
+        .save()
+        .then((savedPerson) => {
+            response.json(savedPerson);
+        })
+        .catch((error) => next(error));
 });
 
 app.put("/api/persons/:id", (request, response, next) => {
@@ -118,9 +102,11 @@ const errorHandling = (error, request, response, next) => {
     console.log(error.message);
 
     if (error.name === "CastError") {
-        response.status(400).send({ error: "malformatted id" });
+        return response.status(400).json({ error: "malformatted id" });
+    } else if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message });
     }
-
+    console.log("next(error)");
     next(error);
 };
 
