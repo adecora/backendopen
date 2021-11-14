@@ -3,3 +3,6 @@ node_modules
 
 # Omit Visual Studio REST client
 requests
+
+# Omit environment variables
+.env
