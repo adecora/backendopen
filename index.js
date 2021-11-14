@@ -32,9 +32,6 @@ const requestLogger = (tokens, req, res) => {
 
 app.use(morgan(requestLogger));
 
-const generateId = () => {
-    return Math.floor(Math.random() * 1_000_000);
-};
 
 app.get("/api/persons", (request, response) => {
     Person.find({}).then((persons) => {
