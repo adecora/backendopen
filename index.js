@@ -74,23 +74,24 @@ app.post("/api/persons", (request, response) => {
         });
     }
 
-    const names = persons.map((p) => p.name.toLowerCase());
+    Person.find({}).then((persons) => {
+        const names = persons.map((p) => p.name.toLowerCase());
 
-    if (names.includes(name.toLowerCase())) {
-        return response.status(400).json({
-            error: "name must be unique",
+        if (names.includes(name.toLowerCase())) {
+            return response.status(400).json({
+                error: "name must be unique",
+            });
+        }
+
+        const person = new Person({
+            name: name,
+            number: number,
         });
-    }
 
-    const person = {
-        name: name,
-        number: number,
-        id: generateId(),
-    };
-
-    persons = persons.concat(person);
-
-    response.json(person);
+        person.save().then((savedPerson) => {
+            response.json(savedPerson);
+        });
+    });
 });
 
 const PORT = process.env.PORT;
