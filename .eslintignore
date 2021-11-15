@@ -1,0 +1,2 @@
+# omit build directory with `npm run lint`
+build
